@@ -9,7 +9,6 @@ Confidential and Proprietary - Protected under copyright and other laws.
 using System;
 using UnityEngine;
 using Vuforia;
-using grubFX;
 
 /// <summary>
 ///     A custom handler that implements the ITrackableEventHandler interface.
@@ -26,8 +25,6 @@ public class DefaultTrackableEventHandler : MonoBehaviour, ITrackableEventHandle
 
     protected virtual void Start()
     {
-        new Parser();
-
         mTrackableBehaviour = GetComponent<TrackableBehaviour>();
         if (mTrackableBehaviour)
         {

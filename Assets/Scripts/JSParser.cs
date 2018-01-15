@@ -31,7 +31,7 @@ namespace grubFX
 
             String nobilities = jurassic.Evaluate<string>("JSON.stringify(nobility)");
 
-            reader = new StreamReader("pathScript.txt");
+            reader = new StreamReader("Assets/Scripts/pathScript.txt");
             string pathScript = reader.ReadToEnd();
             reader.Close();
             String paths = jurassic.Evaluate<string>(pathScript);
