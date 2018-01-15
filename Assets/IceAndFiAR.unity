@@ -530,7 +530,7 @@ MonoBehaviour:
   mPreserveChildSize: 0
   mInitializedInEditor: 1
   mDataSetPath: Vuforia/IceAndFiAR_device_db.xml
-  mExtendedTracking: 0
+  mExtendedTracking: 1
   mAspectRatio: 0.666667
   mImageTargetType: 0
   mWidth: 1

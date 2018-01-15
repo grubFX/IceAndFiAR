@@ -159,6 +159,7 @@ PlayerSettings:
   androidMaxAspectRatio: 2.1
   applicationIdentifier:
     Android: net.felixgruber.www.IceAndFiAR
+    Standalone: net.felixgruber.www.IceAndFiAR
   buildNumber: {}
   AndroidBundleVersionCode: 1
   AndroidMinSdkVersion: 19
@@ -263,6 +264,8 @@ PlayerSettings:
   m_BuildTargetVRSettings: []
   m_BuildTargetEnableVuforiaSettings:
   - m_BuildTarget: Android
+    m_Enabled: 1
+  - m_BuildTarget: Standalone
     m_Enabled: 1
   openGLRequireES31: 0
   openGLRequireES31AEP: 0
@@ -557,7 +560,7 @@ PlayerSettings:
   scriptingBackend: {}
   incrementalIl2cppBuild: {}
   additionalIl2CppArgs: 
-  scriptingRuntimeVersion: 0
+  scriptingRuntimeVersion: 1
   apiCompatibilityLevelPerPlatform: {}
   m_RenderingPath: 1
   m_MobileRenderingPath: 1
@@ -637,7 +640,7 @@ PlayerSettings:
     Collab: 1
     UNet: 1
   facebookSdkVersion: 7.9.4
-  apiCompatibilityLevel: 2
+  apiCompatibilityLevel: 3
   cloudProjectId: 92dc700a-3bda-40a3-8d01-30260df07e21
   projectName: IceAndFiAR
   organizationId: grubfx
