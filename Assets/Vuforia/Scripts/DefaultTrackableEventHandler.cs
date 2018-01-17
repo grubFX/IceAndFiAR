@@ -9,6 +9,7 @@ Confidential and Proprietary - Protected under copyright and other laws.
 using System;
 using UnityEngine;
 using Vuforia;
+using grubFX;
 
 /// <summary>
 ///     A custom handler that implements the ITrackableEventHandler interface.
@@ -17,6 +18,7 @@ public class DefaultTrackableEventHandler : MonoBehaviour, ITrackableEventHandle
 {
     #region PRIVATE_MEMBER_VARIABLES
 
+    private OverlayData data;
     protected TrackableBehaviour mTrackableBehaviour;
 
     #endregion // PRIVATE_MEMBER_VARIABLES
@@ -25,11 +27,17 @@ public class DefaultTrackableEventHandler : MonoBehaviour, ITrackableEventHandle
 
     protected virtual void Start()
     {
+        data = null;
+
         mTrackableBehaviour = GetComponent<TrackableBehaviour>();
         if (mTrackableBehaviour)
         {
             mTrackableBehaviour.RegisterTrackableEventHandler(this);
         }
+
+        JSParser parser = new JSParser();
+        parser.OverlayDataGenerated += HandleEvent;
+        parser.startCalculating("Assets/Scripts/input.txt");
     }
 
     #endregion // UNTIY_MONOBEHAVIOUR_METHODS
@@ -64,6 +72,16 @@ public class DefaultTrackableEventHandler : MonoBehaviour, ITrackableEventHandle
         }
     }
 
+    public void HandleEvent(object sender, EventArgs args)
+    {
+        Debug.Log("Event received: " + args.GetType().ToString() + "\n");
+        if (args.GetType() == typeof(OverlayData))
+        {
+            data = (OverlayData)args;
+            StartDrawing(data);
+        }
+    }
+
     #endregion // PUBLIC_METHODS
 
     #region PRIVATE_METHODS
@@ -85,6 +103,11 @@ public class DefaultTrackableEventHandler : MonoBehaviour, ITrackableEventHandle
         // Enable canvas':
         foreach (var component in canvasComponents)
             component.enabled = true;
+
+        if (data != null)
+        {
+            StartDrawing(data);
+        }
     }
 
 
@@ -105,6 +128,18 @@ public class DefaultTrackableEventHandler : MonoBehaviour, ITrackableEventHandle
         // Disable canvas':
         foreach (var component in canvasComponents)
             component.enabled = false;
+
+        StopDrawing();
+    }
+
+    private void StartDrawing(OverlayData data)
+    {
+        OverlayScript.DrawOverlayData(data);
+    }
+
+    private void StopDrawing()
+    {
+        OverlayScript.StopDrawingOverlay();
     }
 
     #endregion // PRIVATE_METHODS
