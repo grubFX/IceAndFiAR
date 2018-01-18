@@ -104,10 +104,7 @@ public class DefaultTrackableEventHandler : MonoBehaviour, ITrackableEventHandle
         foreach (var component in canvasComponents)
             component.enabled = true;
 
-        if (data != null)
-        {
-            StartDrawing(data);
-        }
+        StartDrawing(data);
     }
 
 
@@ -134,12 +131,15 @@ public class DefaultTrackableEventHandler : MonoBehaviour, ITrackableEventHandle
 
     private void StartDrawing(OverlayData data)
     {
-        OverlayScript.DrawOverlayData(data);
+        if (data != null)
+        {
+            GameObject.Find("ImageTarget")?.GetComponent<OverlayScript>()?.DrawOverlayData(data);
+        }
     }
 
     private void StopDrawing()
     {
-        OverlayScript.StopDrawingOverlay();
+        GameObject.Find("ImageTarget")?.GetComponent<OverlayScript>()?.StopDrawingOverlay();
     }
 
     #endregion // PRIVATE_METHODS
