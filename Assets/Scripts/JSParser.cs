@@ -27,7 +27,7 @@ namespace grubFX
 
             String episodes = jurassic.Evaluate<string>("JSON.stringify(episodes)");
 
-            String locations = jurassic.Evaluate<string>("var out=[];for(key in locations){out.push({key:key,lat:locations[key].lat,long:locations[key].lng})}JSON.stringify(out);");
+            String locations = jurassic.Evaluate<string>("var out=[];for(key in locations){out.push({key:key,coords:{lat:locations[key].lat,long:locations[key].lng}})}JSON.stringify(out);");
 
             String nobilities = jurassic.Evaluate<string>("JSON.stringify(nobility)");
 

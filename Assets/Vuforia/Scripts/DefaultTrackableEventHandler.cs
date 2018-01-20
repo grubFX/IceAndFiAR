@@ -27,6 +27,7 @@ public class DefaultTrackableEventHandler : MonoBehaviour, ITrackableEventHandle
 
     protected virtual void Start()
     {
+
         data = null;
 
         mTrackableBehaviour = GetComponent<TrackableBehaviour>();

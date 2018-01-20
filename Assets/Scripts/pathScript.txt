@@ -6,14 +6,7 @@ var episodes_ = [];
 var coord_ = {lat: 0, long: 0};
 for(name in paths){
 	for(temp of paths[name]){
-		if(temp.hasOwnProperty("path")){
-			for(point of temp["path"]){
-            	if(typeof(point) === 'string'){
-                	path_.push(point);
-            	}
-            }
-        }
-        if(temp.hasOwnProperty("chapters") && Object.keys(temp["chapters"]).length > 0){
+		if(temp.hasOwnProperty("chapters") && Object.keys(temp["chapters"]).length > 0){
             for(chapter of temp["chapters"]){
                 if(typeof(chapter) === 'number'){
                     chapters_.push(chapter);
@@ -21,17 +14,30 @@ for(name in paths){
             }
         }
         if(temp.hasOwnProperty("episodes") && Object.keys(temp["episodes"]).length > 0){
-			for(episode of temp["episodes"]){
+			if(Object.keys(temp["episodes"]).length == 1){
                 if(typeof(episode) === 'number'){
                     episodes_.push(episode);
+                }
+            } else {
+				for(var epNum = temp["episodes"][0]; epNum <= temp["episodes"][1]; epNum++){
+					episodes_.push(epNum);
                 }
             }
         }
         if(temp.hasOwnProperty("coord") && Object.keys(temp["coord"]).length > 1){
-            coord_.lat = temp["coord"][0];
+			coord_.lat = temp["coord"][0];
             coord_.long = temp["coord"][1];
         }
-        paths_.push({points: path_, chapters: chapters_, episodes: episodes_, coord: coord_});
+		if(temp.hasOwnProperty("path") && Object.keys(temp["path"]).length > 1){
+			for(point of temp["path"]){
+				if(typeof(point) === 'string'){
+					path_.push({lat: locations[point].lat, long: locations[point].lng});
+                } else {
+					path_.push({lat: point[0], long: point[1]});
+                }
+            }
+        }
+        paths_.push({path: path_, episodes: episodes_, coord: coord_});
         path_ = [];
 	    chapters_ = [];
         episodes_ = [];
@@ -40,4 +46,4 @@ for(name in paths){
 	out.push({name: name, paths: paths_});
     paths_ = [];
 }
-JSON.stringify(out);
+JSON.stringify(out)
