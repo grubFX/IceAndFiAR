@@ -16,14 +16,12 @@ namespace grubFX
             overlayData = null;
         }
 
-        public void startCalculating(String inputFile)
+        public void StartCalculating(String inputFile)
         {
             StreamReader reader = new StreamReader(inputFile);
             string script = reader.ReadToEnd();
             reader.Close();
             jurassic.Execute(script);
-
-            String chapters = jurassic.Evaluate<string>("JSON.stringify(chapters)");
 
             String episodes = jurassic.Evaluate<string>("JSON.stringify(episodes)");
 
@@ -43,7 +41,7 @@ namespace grubFX
             Console.WriteLine("\nnobilities:\n" + nobilities);
             Console.WriteLine("\npaths:\n" + paths);
             */
-            GenerateOverlayData(chapters, episodes, locations, nobilities, paths);
+            GenerateOverlayData(episodes, locations, nobilities, paths);
         }
 
         public JSParser(Url inputUrl)
@@ -51,9 +49,9 @@ namespace grubFX
             // TODO
         }
 
-        private void GenerateOverlayData(string chapters, string episodes, string locations, string nobilities, string paths)
+        private void GenerateOverlayData(string episodes, string locations, string nobilities, string paths)
         {
-            overlayData = new OverlayData(chapters, episodes, locations, nobilities, paths);
+            overlayData = new OverlayData(episodes, locations, nobilities, paths);
             OverlayDataGenerated?.Invoke(this, overlayData);
         }
     }

@@ -24,7 +24,7 @@ namespace grubFX
 
         public void ReactOnSliderValueChange()
         {
-            Debug.Log("slider value changed to " + episodeSlider?.value);
+            //Debug.Log("slider value changed to " + episodeSlider?.value);
             SetEpisodeLabelOfIndex((int)episodeSlider.value);
             DrawPaths();
         }
@@ -61,7 +61,7 @@ namespace grubFX
         private void DrawPaths()
         {
             pathsObjects = DeepCleanListAndReturn(pathsObjects);
-            foreach (Paths pathsPerPerson in overlayData.PathList)
+            foreach (PathsPerPerson pathsPerPerson in overlayData.AllPathsList)
             {
                 foreach (Path path in pathsPerPerson.PathList)
                 {
@@ -115,14 +115,16 @@ namespace grubFX
                 {
                     Coords c0 = path.PointList[i], c1 = path.PointList[i + 1];
 
-                    GameObject sphere2 = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                    sphere2.GetComponent<Renderer>().material.color = Color.green;
-                    sphere2.transform.localScale = new Vector3(2, 2, 2);
-                    sphere2.transform.position = new Vector3((float)c1.Long, 1, (float)c1.Lat);
-                    pathsObjects.Add(sphere2);
+                    sphere1 = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                    sphere1.GetComponent<Renderer>().material.color = Color.green;
+                    sphere1.transform.localScale = new Vector3(2, 2, 2);
+                    sphere1.transform.position = new Vector3((float)c1.Long, 1, (float)c1.Lat);
+                    pathsObjects.Add(sphere1);
 
+                    /*
                     Gizmos.color = Color.green;
                     Gizmos.DrawLine(new Vector3((float)c0.Long, 0, (float)c0.Lat), new Vector3((float)c1.Long, 0, (float)c1.Lat));
+                    */
                 }
             }
         }

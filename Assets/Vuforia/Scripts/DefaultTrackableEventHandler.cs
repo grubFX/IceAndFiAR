@@ -38,7 +38,7 @@ public class DefaultTrackableEventHandler : MonoBehaviour, ITrackableEventHandle
 
         JSParser parser = new JSParser();
         parser.OverlayDataGenerated += HandleEvent;
-        parser.startCalculating("Assets/Scripts/input.txt");
+        parser.StartCalculating("Assets/Scripts/input.txt");
     }
 
     #endregion // UNTIY_MONOBEHAVIOUR_METHODS

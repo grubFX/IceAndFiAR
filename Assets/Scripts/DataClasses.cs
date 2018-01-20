@@ -39,16 +39,16 @@
         public string Img { get; set; }
 
         [JsonProperty("anchor")]
-        public List<long> Anchor { get; set; }
+        public List<int> Anchor { get; set; }
 
         [JsonProperty("isGreat")]
         public bool? IsGreat { get; set; }
 
         [JsonProperty("chapters")]
-        public List<long> Chapters { get; set; }
+        public List<int> Chapters { get; set; }
 
         [JsonProperty("episodes")]
-        public List<long> Episodes { get; set; }
+        public List<int> Episodes { get; set; }
 
         [JsonProperty("lat")]
         public double? Lat { get; set; }
@@ -60,15 +60,6 @@
         public string Clue { get; set; }
     }
 
-    public partial class Chapter
-    {
-        [JsonProperty("title")]
-        public string Title { get; set; }
-
-        [JsonProperty("url")]
-        public string Url { get; set; }
-    }
-
     public partial class Episode
     {
         [JsonProperty("title")]
@@ -78,7 +69,7 @@
         public string Url { get; set; }
     }
 
-    public partial class Paths
+    public partial class PathsPerPerson
     {
         [JsonProperty("name")]
         public string Name { get; set; }
@@ -89,14 +80,17 @@
 
     public partial class Path
     {
-        [JsonProperty("path")]
-        public List<Coords> PointList { get; set; }
+        [JsonProperty("chapters")]
+        public List<int> Chapters { get; set; }
 
         [JsonProperty("episodes")]
-        public List<long> Episodes { get; set; }
+        public List<int> Episodes { get; set; }
 
-        [JsonProperty("coord")]
+        [JsonProperty("singleCoords")]
         public Coords SingleCoords { get; set; }
+
+        [JsonProperty("points")]
+        public List<Coords> PointList { get; set; }
     }
 
     public partial class Locations
@@ -109,28 +103,14 @@
         public static List<Nobility> FromJson(string json) => JsonConvert.DeserializeObject<List<Nobility>>(json, Converter.Settings);
     }
 
-    public partial class Episodes
+    public partial class ChaptersOrEpisodes
     {
         public static List<Episode> FromJson(string json) => JsonConvert.DeserializeObject<List<Episode>>(json, Converter.Settings);
     }
 
-    public partial class Chapters
-    {
-        public static List<Chapter> FromJson(string json) => JsonConvert.DeserializeObject<List<Chapter>>(json, Converter.Settings);
-    }
-
     public partial class Paths
     {
-        public static List<Paths> FromJson(string json) => JsonConvert.DeserializeObject<List<Paths>>(json, Converter.Settings);
-    }
-
-    public static class Serialize
-    {
-        public static string ToJson(this List<Locations> self) => JsonConvert.SerializeObject(self, Converter.Settings);
-        public static string ToJson(this List<Nobilities> self) => JsonConvert.SerializeObject(self, Converter.Settings);
-        public static string ToJson(this List<Chapters> self) => JsonConvert.SerializeObject(self, Converter.Settings);
-        public static string ToJson(this List<Episode> self) => JsonConvert.SerializeObject(self, Converter.Settings);
-        public static string ToJson(this List<Paths> self) => JsonConvert.SerializeObject(self, Converter.Settings);
+        public static List<PathsPerPerson> FromJson(string json) => JsonConvert.DeserializeObject<List<PathsPerPerson>>(json, Converter.Settings);
     }
 
     public class Converter
@@ -139,6 +119,7 @@
         {
             MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
             DateParseHandling = DateParseHandling.None,
+            CheckAdditionalContent = true
         };
     }
 }
