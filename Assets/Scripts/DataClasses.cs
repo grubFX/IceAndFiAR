@@ -3,7 +3,6 @@
     using System;
     using System.Net;
     using System.Collections.Generic;
-
     using Newtonsoft.Json;
 
     public partial class Location

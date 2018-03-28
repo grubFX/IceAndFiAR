@@ -24,7 +24,7 @@ namespace grubFX
 
         public void ReactOnSliderValueChange()
         {
-            //Debug.Log("slider value changed to " + episodeSlider?.value);
+            Debug.Log("slider value changed to " + episodeSlider?.value);
             SetEpisodeLabelOfIndex((int)episodeSlider.value);
             DrawPaths();
         }

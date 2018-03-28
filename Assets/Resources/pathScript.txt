@@ -1,0 +1,42 @@
+var out = [];
+var path_ = [];
+var paths_ = [];
+var episodes_ = [];
+var coord_ = {};
+for(name in paths){
+	for(temp of paths[name]){
+        if(temp.hasOwnProperty("episodes")){
+			if(Object.keys(temp["episodes"]).length > 1){
+            	for(var epNum = temp["episodes"][0]; epNum <= temp["episodes"][1]; epNum++){
+					episodes_.push(epNum);
+                }
+            } else {
+				episodes_.push(temp.episodes);
+            }
+        }
+        if(temp.hasOwnProperty("coord") && Object.keys(temp["coord"]).length > 1){
+			coord_.lat = temp["coord"][0];
+            coord_.long = temp["coord"][1];
+        }
+        if(temp.hasOwnProperty("key") && Object.keys(temp["key"]).length > 0){
+			coord_.lat = locations[temp["key"]].lat;
+            coord_.long = locations[temp["key"]].lng;
+        }
+		if(temp.hasOwnProperty("path") && Object.keys(temp["path"]).length > 1){
+			for(point of temp["path"]){
+				if(typeof(point) === 'string'){
+					path_.push({lat: locations[point].lat, long: locations[point].lng});
+                } else {
+					path_.push({lat: point[0], long: point[1]});
+                }
+            }
+        }
+        paths_.push({points: path_, episodes: episodes_, singleCoords: coord_});
+        path_ = [];
+        episodes_ = [];
+        coord_ = {};
+    }
+	out.push({name: name, paths: paths_});
+    paths_ = [];
+}
+JSON.stringify(out)
