@@ -103,28 +103,25 @@ namespace grubFX
             // Path
             if (path.PointList.Count > 0)
             {
-                // -- draw [0]
-                GameObject sphere1 = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                sphere1.GetComponent<Renderer>().material.color = Color.green;
-                sphere1.transform.localScale = new Vector3(2, 2, 2);
-                sphere1.transform.position = new Vector3((float)path.PointList[0].Long, 1, (float)path.PointList[0].Lat);
-                pathsObjects.Add(sphere1);
+                GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                sphere.AddComponent<LineRenderer>();
+                LineRenderer lineRenderer = sphere.GetComponent<LineRenderer>();
+                lineRenderer.positionCount = path.PointList.Count;
+                pathsObjects.Add(sphere); // in order to later get the LineRenderer from it to delete it
 
-                // -- draw [1] to end
-                for (int i = 0; i < path.PointList.Count - 1; i++)
+                // -- draw all
+                for (int i = 0; i < path.PointList.Count; i++)
                 {
-                    Coords c0 = path.PointList[i], c1 = path.PointList[i + 1];
-
-                    sphere1 = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                    sphere1.GetComponent<Renderer>().material.color = Color.green;
-                    sphere1.transform.localScale = new Vector3(2, 2, 2);
-                    sphere1.transform.position = new Vector3((float)c1.Long, 1, (float)c1.Lat);
-                    pathsObjects.Add(sphere1);
-
-                    /*
-                    Gizmos.color = Color.green;
-                    Gizmos.DrawLine(new Vector3((float)c0.Long, 0, (float)c0.Lat), new Vector3((float)c1.Long, 0, (float)c1.Lat));
-                    */
+                    sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                    Coords c0 = path.PointList[i];
+                    sphere.GetComponent<Renderer>().material.color = Color.green;
+                    sphere.transform.localScale = new Vector3(2, 2, 2);
+                    Vector3 p = new Vector3((float)c0.Long, 1, (float)c0.Lat);
+                    sphere.transform.position = p;
+                    lineRenderer.SetPosition(i, p);
+                    lineRenderer.startColor = Color.green;
+                    lineRenderer.endColor = Color.green;
+                    pathsObjects.Add(sphere);
                 }
             }
         }
@@ -154,6 +151,12 @@ namespace grubFX
                 {
                     foreach (GameObject o in list)
                     {
+                        LineRenderer lr = o.GetComponent<LineRenderer>();
+                        if (lr != null)
+                        {
+                            lr.positionCount = 0;
+                            Destroy(lr);
+                        }
                         Destroy(o);
                     }
                 }
