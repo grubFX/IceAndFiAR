@@ -35,6 +35,16 @@ namespace grubFX
 
         }
 
+        /*
+        public Vector3 PolarToCartesian(float lat, float lng)
+        {
+            var origin = new Vector3(0, 0, 1);
+            var rotation = Quaternion.Euler(lat, lng, 0);
+            Vector3 point = rotation * origin;
+            return point;
+        }
+        */
+
         public void DrawOverlayData(OverlayData data)
         {
             overlayData = data;
@@ -82,6 +92,9 @@ namespace grubFX
                 {
                     GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
                     cube.GetComponent<Renderer>().material.color = Color.gray;
+                    // Vector3 converted = PolarToCartesian((float)l.Coords.Lat, (float)l.Coords.Long);
+                    // GameObject target = GameObject.Find("ImageTarget");
+                    // float scale = target.transform.localScale.x;
                     cube.transform.position = new Vector3((float)l.Coords.Long, 0, (float)l.Coords.Lat);
                     locationObjects.Add(cube);
                 }
@@ -90,14 +103,16 @@ namespace grubFX
 
         private void DrawSinglePath(Path path)
         {
+            Color newColor = new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value, 1);
+
             // SingleCoords
             if (path.SingleCoords.Lat != 0 && path.SingleCoords.Long != 0)
             {
-                GameObject sphere0 = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                sphere0.GetComponent<Renderer>().material.color = Color.green;
-                sphere0.transform.localScale = new Vector3(2, 2, 2);
-                sphere0.transform.position = new Vector3((float)path.SingleCoords.Long, 1, (float)path.SingleCoords.Lat);
-                pathsObjects.Add(sphere0);
+                GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                sphere.GetComponent<Renderer>().material.color = newColor;
+                sphere.transform.localScale = new Vector3(2, 2, 2);
+                sphere.transform.position = new Vector3((float)path.SingleCoords.Long, 1, (float)path.SingleCoords.Lat);
+                pathsObjects.Add(sphere);
             }
 
             // Path
@@ -114,13 +129,17 @@ namespace grubFX
                 {
                     sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                     Coords c0 = path.PointList[i];
-                    sphere.GetComponent<Renderer>().material.color = Color.green;
+                    sphere.GetComponent<Renderer>().material.color = newColor;
                     sphere.transform.localScale = new Vector3(2, 2, 2);
                     Vector3 p = new Vector3((float)c0.Long, 1, (float)c0.Lat);
                     sphere.transform.position = p;
                     lineRenderer.SetPosition(i, p);
-                    lineRenderer.startColor = Color.green;
-                    lineRenderer.endColor = Color.green;
+                    lineRenderer.startWidth = 2;
+                    lineRenderer.endWidth = 2;
+                    lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
+                    lineRenderer.material.color = newColor;
+                    lineRenderer.startColor = newColor;
+                    lineRenderer.endColor = newColor;
                     pathsObjects.Add(sphere);
                 }
             }
