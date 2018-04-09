@@ -12,6 +12,7 @@ namespace grubFX
         private ArrayList locationObjects, pathsObjects;
         private Slider episodeSlider;
         private Text episodeLabel;
+        private Camera arCamera;
 
         // Use this for initialization
         void Start()
@@ -32,7 +33,17 @@ namespace grubFX
         // Update is called once per frame
         void Update()
         {
+            if (arCamera == null)
+            {
+                arCamera = GameObject.Find("ARCamera").GetComponent<Camera>();
+            }
+            RaycastHit hit;
+            Ray ray = arCamera.ScreenPointToRay(Input.mousePosition);
 
+            if (Physics.Raycast(ray, out hit))
+            {
+                Debug.Log("hit " + hit.transform.gameObject.name);
+            }
         }
 
         /*
@@ -91,6 +102,7 @@ namespace grubFX
                 if (l != null && l.Coords != null && l.Coords.Lat != 0 && l.Coords.Long != 0)
                 {
                     GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    cube.name = l.Key;
                     cube.GetComponent<Renderer>().material.color = Color.gray;
                     // Vector3 converted = PolarToCartesian((float)l.Coords.Lat, (float)l.Coords.Long);
                     // GameObject target = GameObject.Find("ImageTarget");
