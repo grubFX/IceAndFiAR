@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using UnityEngine.UI;
+using System.Globalization;
 
 namespace grubFX
 {
@@ -12,6 +13,7 @@ namespace grubFX
         private ArrayList locationObjects, pathsObjects;
         private Slider episodeSlider;
         private Text episodeLabel;
+        private TextMesh tagLabel;
         private Camera arCamera;
         private Material myMaterial;
         private GameObject locationTag, hitObject;
@@ -53,7 +55,24 @@ namespace grubFX
             {
                 arCamera = GameObject.Find("ARCamera").GetComponent<Camera>();
             }
-            ray = arCamera.ScreenPointToRay(Input.mousePosition);
+            switch (Application.platform)
+            {
+                case RuntimePlatform.Android:
+                case RuntimePlatform.IPhonePlayer:
+                    Touch touch = Input.GetTouch(0);
+                    if (touch.phase == TouchPhase.Began)
+                    {
+                        ray = arCamera.ScreenPointToRay(touch.position);
+                    }
+                    break;
+
+                case RuntimePlatform.WindowsEditor:
+                case RuntimePlatform.OSXPlayer:
+                default:
+                    ray = arCamera.ScreenPointToRay(Input.mousePosition);
+                    break;
+            }
+
             if (Physics.Raycast(ray, out hit))
             {
                 hitObject = hit.collider.gameObject;
@@ -66,12 +85,18 @@ namespace grubFX
                         locationTag = GameObject.Find("LocationTag");
                     }
                     locationTag.SetActive(true);
+                    if (tagLabel == null)
+                    {
+                        tagLabel = GameObject.Find("TagLabel").GetComponent<TextMesh>();
+                    }
+                    tagLabel.text = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(hitObject.name.Replace("_", " ").Replace("%27", "'"));
+
                     // hover over touched object
                     pos = new Vector3(hitObject.transform.position.x, hitObject.transform.position.y + 16, hitObject.transform.position.z + 16);
                     locationTag.transform.SetPositionAndRotation(pos, rot * arCamera.transform.rotation);
                 }
             }
-            if (locationTag)
+            if (locationTag && locationTag.activeSelf)
             {
                 locationTag.transform.SetPositionAndRotation(locationTag.transform.position, rot * arCamera.transform.rotation);
             }
@@ -149,9 +174,10 @@ namespace grubFX
             Color newColor = new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value, 1);
 
             GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            sphere.name = name;
+            sphere.name = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(name);
+
             // SingleCoords
-            if (path.SingleCoords.Lat != 0 && path.SingleCoords.Long != 0)
+            if (path.PointList.Count == 0 && path.SingleCoords.Lat != 0 && path.SingleCoords.Long != 0)
             {
                 sphere.GetComponent<Renderer>().material.color = newColor;
                 sphere.transform.localScale = new Vector3(2, 2, 2);
@@ -160,7 +186,7 @@ namespace grubFX
             }
 
             // Path
-            if (path.PointList.Count > 0)
+            else if (path.PointList.Count > 0)
             {
                 sphere.AddComponent<LineRenderer>();
                 LineRenderer lineRenderer = sphere.GetComponent<LineRenderer>();
@@ -170,21 +196,28 @@ namespace grubFX
                 // -- draw all
                 for (int i = 0; i < path.PointList.Count; i++)
                 {
-                    sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                    if (sphere == null)
+                    {
+                        sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                    }
                     sphere.name = name;
                     sphere.GetComponent<Renderer>().material.color = newColor;
                     sphere.transform.localScale = new Vector3(2, 2, 2);
                     Coords c0 = path.PointList[i];
-                    Vector3 p = new Vector3((float)c0.Long, 1, (float)c0.Lat);
-                    sphere.transform.position = p;
-                    lineRenderer.SetPosition(i, p);
-                    lineRenderer.startWidth = 2;
-                    lineRenderer.endWidth = 2;
-                    lineRenderer.material = myMaterial;
-                    lineRenderer.material.color = newColor;
-                    lineRenderer.startColor = newColor;
-                    lineRenderer.endColor = newColor;
-                    pathsObjects.Add(sphere);
+                    if (c0.Lat != 0 && c0.Long != 0)
+                    {
+                        Vector3 p = new Vector3((float)c0.Long, 1, (float)c0.Lat);
+                        sphere.transform.position = p;
+                        lineRenderer.SetPosition(i, p);
+                        lineRenderer.startWidth = 2;
+                        lineRenderer.endWidth = 2;
+                        lineRenderer.material = myMaterial;
+                        lineRenderer.material.color = newColor;
+                        lineRenderer.startColor = newColor;
+                        lineRenderer.endColor = newColor;
+                        pathsObjects.Add(sphere);
+                        sphere = null;
+                    }
                 }
             }
         }
@@ -193,10 +226,7 @@ namespace grubFX
         {
             Debug.Log("stopping drawing of overlay");
 
-            if (locationTag)
-            {
-                locationTag.SetActive(false);
-            }
+            locationTag?.SetActive(false);
 
             DeepCleanListAndReturn(locationObjects);
             DeepCleanListAndReturn(pathsObjects);
