@@ -16,11 +16,9 @@ namespace grubFX
         private TextMesh tagLabel;
         private Camera arCamera;
         private Material myMaterial;
-        private GameObject locationTag, hitObject;
+        private GameObject locationTag, hitObject, rotationPoint, locationTagBox;
         private Ray ray;
         private RaycastHit hit;
-        private Vector3 pos;
-        private Quaternion rot;
 
         // Use this for initialization
         void Start()
@@ -37,8 +35,6 @@ namespace grubFX
             episodeSlider?.onValueChanged.AddListener(delegate { ReactOnSliderValueChange(); });
 
             episodeLabel = GameObject.Find("EpisodeLabel").GetComponent<Text>();
-
-            rot = Quaternion.Euler(new Vector3(-45, 0, 0));
         }
 
         public void ReactOnSliderValueChange()
@@ -55,6 +51,15 @@ namespace grubFX
             {
                 arCamera = GameObject.Find("ARCamera").GetComponent<Camera>();
             }
+            if (locationTag == null)
+            {
+                locationTag = GameObject.Find("LocationTag");
+            }
+            if (rotationPoint == null)
+            {
+                rotationPoint = GameObject.Find("RotationPoint");
+            }
+
             switch (Application.platform)
             {
                 case RuntimePlatform.Android:
@@ -76,14 +81,10 @@ namespace grubFX
             if (Physics.Raycast(ray, out hit))
             {
                 hitObject = hit.collider.gameObject;
-                Debug.Log("hit " + hitObject.name);
+                //Debug.Log("hit " + hitObject.name);
                 if (!hitObject.name.Equals("Board") && !hitObject.name.Equals("Triangle"))
                 {
                     // show locationTag when object was touched
-                    if (locationTag == null)
-                    {
-                        locationTag = GameObject.Find("LocationTag");
-                    }
                     locationTag.SetActive(true);
                     if (tagLabel == null)
                     {
@@ -91,14 +92,25 @@ namespace grubFX
                     }
                     tagLabel.text = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(hitObject.name.Replace("_", " ").Replace("%27", "'"));
 
+                    if (locationTagBox == null)
+                    {
+                        locationTagBox = GameObject.Find("LocationTagBox");
+                    }
                     // hover over touched object
-                    pos = new Vector3(hitObject.transform.position.x, hitObject.transform.position.y + 16, hitObject.transform.position.z + 16);
-                    locationTag.transform.SetPositionAndRotation(pos, rot * arCamera.transform.rotation);
+                    locationTagBox.transform.position = hitObject.transform.position;
                 }
             }
+
             if (locationTag && locationTag.activeSelf)
             {
-                locationTag.transform.SetPositionAndRotation(locationTag.transform.position, rot * arCamera.transform.rotation);
+                //locationTag.transform.SetPositionAndRotation(locationTag.transform.position, rot * arCamera.transform.rotation);
+                //locationTag.transform.RotateAround(rotationPoint.transform.position, Vector3.forward, arCamera.transform.rotation.y);
+
+                //Debug.Log("angle: " + rot.eulerAngles.y + "\t/ sin: " + Mathf.Sin(rot.eulerAngles.y / ((float)Math.PI * 2f)) + "\t/ cos:" + Mathf.Cos(rot.eulerAngles.y / ((float)Math.PI * 2f)));
+                Vector3 rot = arCamera.transform.rotation.eulerAngles;
+                locationTag.transform.RotateAround(rotationPoint.transform.position, Vector3.up, rot.x - locationTag.transform.rotation.eulerAngles.x);
+                locationTag.transform.RotateAround(rotationPoint.transform.position, Vector3.up, rot.y - locationTag.transform.rotation.eulerAngles.y);
+                locationTag.transform.RotateAround(rotationPoint.transform.position, Vector3.up, rot.z - locationTag.transform.rotation.eulerAngles.z);
             }
         }
 
@@ -158,7 +170,7 @@ namespace grubFX
                 if (l != null && l.Coords != null && l.Coords.Lat != 0 && l.Coords.Long != 0)
                 {
                     GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                    cube.name = l.Key;
+                    cube.name = l.Key.Replace("-", " ");
                     cube.GetComponent<Renderer>().material.color = Color.gray;
                     // Vector3 converted = PolarToCartesian((float)l.Coords.Lat, (float)l.Coords.Long);
                     // GameObject target = GameObject.Find("ImageTarget");
