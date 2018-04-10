@@ -13,10 +13,13 @@ namespace grubFX
         private Slider episodeSlider;
         private Text episodeLabel;
         private Camera arCamera;
+        private Material myMaterial;
 
         // Use this for initialization
         void Start()
         {
+            myMaterial = new Material(Shader.Find("Sprites/Default"));
+
             episodeSlider = GameObject.Find("EpisodeSlider").GetComponent<Slider>();
             episodeSlider?.onValueChanged.AddListener(delegate { ReactOnSliderValueChange(); });
 
@@ -88,7 +91,7 @@ namespace grubFX
                 {
                     if (episodeSlider != null && path.Episodes.Contains((int)episodeSlider.value))
                     {
-                        DrawSinglePath(path);
+                        DrawSinglePath(path, pathsPerPerson.Name);
                     }
                 }
             }
@@ -113,14 +116,16 @@ namespace grubFX
             }
         }
 
-        private void DrawSinglePath(Path path)
+        private void DrawSinglePath(Path path, String name)
         {
             Color newColor = new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value, 1);
+
+            GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            sphere.name = name;
 
             // SingleCoords
             if (path.SingleCoords.Lat != 0 && path.SingleCoords.Long != 0)
             {
-                GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                 sphere.GetComponent<Renderer>().material.color = newColor;
                 sphere.transform.localScale = new Vector3(2, 2, 2);
                 sphere.transform.position = new Vector3((float)path.SingleCoords.Long, 1, (float)path.SingleCoords.Lat);
@@ -130,7 +135,6 @@ namespace grubFX
             // Path
             if (path.PointList.Count > 0)
             {
-                GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                 sphere.AddComponent<LineRenderer>();
                 LineRenderer lineRenderer = sphere.GetComponent<LineRenderer>();
                 lineRenderer.positionCount = path.PointList.Count;
@@ -148,7 +152,7 @@ namespace grubFX
                     lineRenderer.SetPosition(i, p);
                     lineRenderer.startWidth = 2;
                     lineRenderer.endWidth = 2;
-                    lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
+                    lineRenderer.material = myMaterial;
                     lineRenderer.material.color = newColor;
                     lineRenderer.startColor = newColor;
                     lineRenderer.endColor = newColor;
