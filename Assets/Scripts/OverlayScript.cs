@@ -14,16 +14,29 @@ namespace grubFX
         private Text episodeLabel;
         private Camera arCamera;
         private Material myMaterial;
+        private GameObject locationTag, hitObject;
+        private Ray ray;
+        private RaycastHit hit;
+        private Vector3 pos;
+        private Quaternion rot;
 
         // Use this for initialization
         void Start()
         {
+            if (locationTag == null)
+            {
+                locationTag = GameObject.Find("LocationTag");
+            }
+            locationTag.SetActive(false);
+
             myMaterial = new Material(Shader.Find("Sprites/Default"));
 
             episodeSlider = GameObject.Find("EpisodeSlider").GetComponent<Slider>();
             episodeSlider?.onValueChanged.AddListener(delegate { ReactOnSliderValueChange(); });
 
             episodeLabel = GameObject.Find("EpisodeLabel").GetComponent<Text>();
+
+            rot = Quaternion.Euler(new Vector3(-45, 0, 0));
         }
 
         public void ReactOnSliderValueChange()
@@ -33,19 +46,34 @@ namespace grubFX
             DrawPaths();
         }
 
-        // Update is called once per frame
         void Update()
         {
+            // find object hit by Raycast after Touch
             if (arCamera == null)
             {
                 arCamera = GameObject.Find("ARCamera").GetComponent<Camera>();
             }
-            RaycastHit hit;
-            Ray ray = arCamera.ScreenPointToRay(Input.mousePosition);
-
+            ray = arCamera.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out hit))
             {
-                Debug.Log("hit " + hit.transform.gameObject.name);
+                hitObject = hit.collider.gameObject;
+                Debug.Log("hit " + hitObject.name);
+                if (!hitObject.name.Equals("Board") && !hitObject.name.Equals("Triangle"))
+                {
+                    // show locationTag when object was touched
+                    if (locationTag == null)
+                    {
+                        locationTag = GameObject.Find("LocationTag");
+                    }
+                    locationTag.SetActive(true);
+                    // hover over touched object
+                    pos = new Vector3(hitObject.transform.position.x, hitObject.transform.position.y + 16, hitObject.transform.position.z + 16);
+                    locationTag.transform.SetPositionAndRotation(pos, rot * arCamera.transform.rotation);
+                }
+            }
+            if (locationTag)
+            {
+                locationTag.transform.SetPositionAndRotation(locationTag.transform.position, rot * arCamera.transform.rotation);
             }
         }
 
@@ -110,7 +138,7 @@ namespace grubFX
                     // Vector3 converted = PolarToCartesian((float)l.Coords.Lat, (float)l.Coords.Long);
                     // GameObject target = GameObject.Find("ImageTarget");
                     // float scale = target.transform.localScale.x;
-                    cube.transform.position = new Vector3((float)l.Coords.Long, 0, (float)l.Coords.Lat);
+                    cube.transform.position = new Vector3((float)l.Coords.Long, 1, (float)l.Coords.Lat);
                     locationObjects.Add(cube);
                 }
             }
@@ -122,7 +150,6 @@ namespace grubFX
 
             GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             sphere.name = name;
-
             // SingleCoords
             if (path.SingleCoords.Lat != 0 && path.SingleCoords.Long != 0)
             {
@@ -144,9 +171,10 @@ namespace grubFX
                 for (int i = 0; i < path.PointList.Count; i++)
                 {
                     sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                    Coords c0 = path.PointList[i];
+                    sphere.name = name;
                     sphere.GetComponent<Renderer>().material.color = newColor;
                     sphere.transform.localScale = new Vector3(2, 2, 2);
+                    Coords c0 = path.PointList[i];
                     Vector3 p = new Vector3((float)c0.Long, 1, (float)c0.Lat);
                     sphere.transform.position = p;
                     lineRenderer.SetPosition(i, p);
@@ -164,6 +192,11 @@ namespace grubFX
         public void StopDrawingOverlay()
         {
             Debug.Log("stopping drawing of overlay");
+
+            if (locationTag)
+            {
+                locationTag.SetActive(false);
+            }
 
             DeepCleanListAndReturn(locationObjects);
             DeepCleanListAndReturn(pathsObjects);
