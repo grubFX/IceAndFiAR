@@ -124,6 +124,26 @@ namespace grubFX
         }
         */
 
+        private Vector3 LatLngToXY(Coords input)
+        {
+            float radius = 250;
+            Vector3 v;
+            /*
+            v.x = radius * Mathf.Cos(ToRadians(input.Lat)) * Mathf.Sin(ToRadians(input.Long));
+            v.y = radius * Mathf.Sin(ToRadians(input.Lat));
+            v.z = radius * Mathf.Cos(ToRadians(input.Lat)) * Mathf.Cos(ToRadians(input.Long));
+            */
+            v.x = (float)(input.Long * 1.39);
+            v.y = 0;
+            v.z = (float)(input.Lat * (1.34 + 0.000685 * input.Lat + 0.000141 * input.Lat * input.Lat));
+            return v;
+        }
+
+        private float ToRadians(double degrees)
+        {
+            return (float)degrees * Mathf.Deg2Rad;
+        }
+
         public void DrawOverlayData(OverlayData data)
         {
             overlayData = data;
@@ -175,7 +195,8 @@ namespace grubFX
                     // Vector3 converted = PolarToCartesian((float)l.Coords.Lat, (float)l.Coords.Long);
                     // GameObject target = GameObject.Find("ImageTarget");
                     // float scale = target.transform.localScale.x;
-                    cube.transform.position = new Vector3((float)l.Coords.Long, 1, (float)l.Coords.Lat);
+                    //cube.transform.position = new Vector3((float)l.Coords.Long, 1, (float)l.Coords.Lat);
+                    cube.transform.position = LatLngToXY(l.Coords);
                     locationObjects.Add(cube);
                 }
             }
@@ -193,7 +214,7 @@ namespace grubFX
             {
                 sphere.GetComponent<Renderer>().material.color = newColor;
                 sphere.transform.localScale = new Vector3(2, 2, 2);
-                sphere.transform.position = new Vector3((float)path.SingleCoords.Long, 1, (float)path.SingleCoords.Lat);
+                sphere.transform.position = LatLngToXY(path.SingleCoords);
                 pathsObjects.Add(sphere);
             }
 
@@ -215,10 +236,10 @@ namespace grubFX
                     sphere.name = name;
                     sphere.GetComponent<Renderer>().material.color = newColor;
                     sphere.transform.localScale = new Vector3(2, 2, 2);
-                    Coords c0 = path.PointList[i];
-                    if (c0.Lat != 0 && c0.Long != 0)
+                    Coords c = path.PointList[i];
+                    if (c.Lat != 0 && c.Long != 0)
                     {
-                        Vector3 p = new Vector3((float)c0.Long, 1, (float)c0.Lat);
+                        Vector3 p = LatLngToXY(c);
                         sphere.transform.position = p;
                         lineRenderer.SetPosition(i, p);
                         lineRenderer.startWidth = 2;
