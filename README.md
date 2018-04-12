@@ -1,5 +1,5 @@
 # IceAndFiAR
 AR implmentation of quartermaester.info
 
-!(img/screenshot0.jpg "Screenshot")
-!(img/screenshot1.jpg "Screenshot")
+![Screenshot](/img/screenshot0.jpg?raw=true "Screenshot")
+![Screenshot](/img/screenshot1.jpg?raw=true "Screenshot")
