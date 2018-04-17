@@ -46,7 +46,6 @@ namespace grubFX
 
         void Update()
         {
-            // find object hit by Raycast after Touch
             if (arCamera == null)
             {
                 arCamera = GameObject.Find("ARCamera").GetComponent<Camera>();
@@ -78,6 +77,7 @@ namespace grubFX
                     break;
             }
 
+            // find object hit by Raycast after Touch
             if (Physics.Raycast(ray, out hit))
             {
                 hitObject = hit.collider.gameObject;
@@ -103,10 +103,6 @@ namespace grubFX
 
             if (locationTag && locationTag.activeSelf)
             {
-                //locationTag.transform.SetPositionAndRotation(locationTag.transform.position, rot * arCamera.transform.rotation);
-                //locationTag.transform.RotateAround(rotationPoint.transform.position, Vector3.forward, arCamera.transform.rotation.y);
-
-                //Debug.Log("angle: " + rot.eulerAngles.y + "\t/ sin: " + Mathf.Sin(rot.eulerAngles.y / ((float)Math.PI * 2f)) + "\t/ cos:" + Mathf.Cos(rot.eulerAngles.y / ((float)Math.PI * 2f)));
                 Vector3 rot = arCamera.transform.rotation.eulerAngles;
                 locationTag.transform.RotateAround(rotationPoint.transform.position, Vector3.up, rot.x - locationTag.transform.rotation.eulerAngles.x);
                 locationTag.transform.RotateAround(rotationPoint.transform.position, Vector3.up, rot.y - locationTag.transform.rotation.eulerAngles.y);
@@ -114,25 +110,9 @@ namespace grubFX
             }
         }
 
-        /*
-        public Vector3 PolarToCartesian(float lat, float lng)
-        {
-            var origin = new Vector3(0, 0, 1);
-            var rotation = Quaternion.Euler(lat, lng, 0);
-            Vector3 point = rotation * origin;
-            return point;
-        }
-        */
-
         private Vector3 LatLngToXY(Coords input)
         {
-            float radius = 250;
             Vector3 v;
-            /*
-            v.x = radius * Mathf.Cos(ToRadians(input.Lat)) * Mathf.Sin(ToRadians(input.Long));
-            v.y = radius * Mathf.Sin(ToRadians(input.Lat));
-            v.z = radius * Mathf.Cos(ToRadians(input.Lat)) * Mathf.Cos(ToRadians(input.Long));
-            */
             v.x = (float)(input.Long * 1.39);
             v.y = 0;
             v.z = (float)(input.Lat * (1.34 + 0.000685 * input.Lat + 0.000141 * input.Lat * input.Lat));
@@ -159,11 +139,7 @@ namespace grubFX
 
             Debug.Log("starting drawing of overlay");
 
-
-            // locations
             DrawLocations();
-
-            // paths
             DrawPaths();
         }
 
@@ -192,10 +168,6 @@ namespace grubFX
                     GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
                     cube.name = l.Key.Replace("-", " ");
                     cube.GetComponent<Renderer>().material.color = Color.gray;
-                    // Vector3 converted = PolarToCartesian((float)l.Coords.Lat, (float)l.Coords.Long);
-                    // GameObject target = GameObject.Find("ImageTarget");
-                    // float scale = target.transform.localScale.x;
-                    //cube.transform.position = new Vector3((float)l.Coords.Long, 1, (float)l.Coords.Lat);
                     cube.transform.position = LatLngToXY(l.Coords);
                     locationObjects.Add(cube);
                 }
@@ -226,7 +198,6 @@ namespace grubFX
                 lineRenderer.positionCount = path.PointList.Count;
                 pathsObjects.Add(sphere); // in order to later get the LineRenderer from it to delete it
 
-                // -- draw all
                 for (int i = 0; i < path.PointList.Count; i++)
                 {
                     if (sphere == null)
@@ -241,6 +212,10 @@ namespace grubFX
                     {
                         Vector3 p = LatLngToXY(c);
                         sphere.transform.position = p;
+                        if (i < path.PointList.Count - 1)
+                        {
+                            AddColliderToLine(lineRenderer, p, LatLngToXY(path.PointList[i + 1]), name);
+                        }
                         lineRenderer.SetPosition(i, p);
                         lineRenderer.startWidth = 2;
                         lineRenderer.endWidth = 2;
@@ -253,6 +228,22 @@ namespace grubFX
                     }
                 }
             }
+        }
+
+        private void AddColliderToLine(LineRenderer line, Vector3 startPos, Vector3 endPos, String name)
+        {
+            BoxCollider col = new GameObject(name).AddComponent<BoxCollider>();
+            col.transform.parent = line.transform;
+            float lineLength = Vector3.Distance(startPos, endPos);
+            col.size = new Vector3(lineLength, line.startWidth, 1); // X = length of line, Y = width of line
+            col.transform.position = (startPos + endPos) / 2;
+            float angle = Mathf.Abs(startPos.y - endPos.y) / Mathf.Abs(startPos.x - endPos.x);
+            if ((startPos.y < endPos.y && startPos.x > endPos.x) || (endPos.y < startPos.y && endPos.x > startPos.x))
+            {
+                angle *= -1;
+            }
+            angle = Mathf.Rad2Deg * Mathf.Atan(angle);
+            col.transform.Rotate(0, 0, angle);
         }
 
         public void StopDrawingOverlay()

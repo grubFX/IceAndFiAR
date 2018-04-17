@@ -19,7 +19,7 @@ namespace grubFX
 
         /*
         public void StartCalculating(String inputFile)
-        {
+        { // since Jurrasic is not available on Android we will use the pre parsed JSON files as sources
             StreamReader reader = new StreamReader(inputFile);
             string script = reader.ReadToEnd();
             reader.Close();
@@ -43,23 +43,8 @@ namespace grubFX
         }
         */
 
-        public void StartCalculating() { // since Jurrasic is not available on Android we will use the pre parsed JSON files as sources
-            /*StreamReader reader = new StreamReader("Assets/Resources/episodes.txt");
-            String episodes = reader.ReadToEnd();
-            reader.Close();
-
-            reader = new StreamReader("Assets/Resources/locations.txt");
-            String locations = reader.ReadToEnd();
-            reader.Close();
-
-            reader = new StreamReader("Assets/Resources/nobilities.txt");
-            String nobilities = reader.ReadToEnd();
-            reader.Close();
-
-            reader = new StreamReader("Assets/Resources/paths.txt");
-            String paths = reader.ReadToEnd();
-            reader.Close();
-            */
+        public void StartCalculating()
+        { // since Jurrasic is not available on Android we will use the pre parsed JSON files as sources
             String episodes = (Resources.Load("episodes") as TextAsset).ToString();
             String locations = (Resources.Load("locations") as TextAsset).ToString();
             String nobilities = (Resources.Load("nobilities") as TextAsset).ToString();
@@ -69,7 +54,7 @@ namespace grubFX
 
         public JSParser(Url inputUrl)
         {
-            // TODO inpurt JS file directly from Website
+            // here could be code to import the JS file directly from the website and parse it
         }
 
         private void GenerateOverlayData(string episodes, string locations, string nobilities, string paths)
