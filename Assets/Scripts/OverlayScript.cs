@@ -77,28 +77,48 @@ namespace grubFX
                     break;
             }
 
-            // find object hit by Raycast after Touch
-            if (Physics.Raycast(ray, out hit))
+            // find objects hit by Raycast after Touch
+            RaycastHit[] hits = Physics.RaycastAll(ray);
+            Boolean showLocationTag = false;
+            String titleToShow = "";
+            foreach (RaycastHit hit in hits)
             {
                 hitObject = hit.collider.gameObject;
                 //Debug.Log("hit " + hitObject.name);
                 if (!hitObject.name.Equals("Board") && !hitObject.name.Equals("Triangle"))
                 {
                     // show locationTag when object was touched
-                    locationTag.SetActive(true);
-                    if (tagLabel == null)
+                    showLocationTag = true;
+                    String s = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(hitObject.name.Replace("_", " ").Replace("%27", "'"));
+                    if (!titleToShow.Contains(s))
                     {
-                        tagLabel = GameObject.Find("TagLabel").GetComponent<TextMesh>();
+                        if ((titleToShow.Length % 15) + s.Length + 1 >= 15)
+                        {
+                            titleToShow += s + ",\n";
+                        }
+                        else
+                        {
+                            titleToShow += s + ", ";
+                        }
                     }
-                    tagLabel.text = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(hitObject.name.Replace("_", " ").Replace("%27", "'"));
-
-                    if (locationTagBox == null)
-                    {
-                        locationTagBox = GameObject.Find("LocationTagBox");
-                    }
-                    // hover over touched object
-                    locationTagBox.transform.position = hitObject.transform.position;
                 }
+            }
+
+            if (showLocationTag)
+            {
+                locationTag.SetActive(true);
+                if (tagLabel == null)
+                {
+                    tagLabel = GameObject.Find("TagLabel").GetComponent<TextMesh>();
+                }
+                tagLabel.text = titleToShow.TrimEnd(new char[] { ' ', ',', '\n' });
+
+                if (locationTagBox == null)
+                {
+                    locationTagBox = GameObject.Find("LocationTagBox");
+                }
+                // hover over touched object
+                locationTagBox.transform.position = hitObject.transform.position;
             }
 
             if (locationTag && locationTag.activeSelf)

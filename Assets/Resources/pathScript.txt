@@ -37,6 +37,11 @@ for(name in paths){
             if (typeof(s) === 'string'){
                 color_ = "#" + s.toString().match(/[a-fA-F0-9]{6}/);
             }
+        } else if(temp.hasOwnProperty("line")){
+            var s = temp["line"];
+            if (typeof(s) === 'string'){
+                color_ = "#" + s.toString().match(/[a-fA-F0-9]{6}/);
+            }
         }
         paths_.push({points: path_, episodes: episodes_, singleCoords: coord_, color: color_});
         path_ = [];
