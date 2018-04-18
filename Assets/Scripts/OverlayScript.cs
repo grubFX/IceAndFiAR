@@ -176,7 +176,13 @@ namespace grubFX
 
         private void DrawSinglePath(Path path, String name)
         {
-            Color newColor = new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value, 1);
+            Color newColor;
+            if (path.Color == "" || !ColorUtility.TryParseHtmlString(path.Color, out newColor))
+            {
+                newColor = new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value, 1);
+                Debug.Log("parsed color: " + newColor);
+            }
+            Debug.Log("newColor: " + newColor);
 
             GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             sphere.name = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(name);

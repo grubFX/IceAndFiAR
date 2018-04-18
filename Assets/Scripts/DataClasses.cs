@@ -90,6 +90,9 @@
 
         [JsonProperty("points")]
         public List<Coords> PointList { get; set; }
+
+        [JsonProperty("color")]
+        public string Color { get; set; }
     }
 
     public partial class Locations
